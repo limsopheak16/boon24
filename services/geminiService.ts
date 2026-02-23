@@ -366,4 +366,5 @@ export const editImageWithAi = async (
         }
         throw error;
     }
+    
   };
