@@ -6,19 +6,8 @@ import { EditPanel } from './components/EditPanel';
 import { MaterialPanel } from './components/MaterialPanel';
 import { Login } from './components/Login';
 import { RenderOptions, AppMode } from './types';
-import { renderWithAi } from './services/geminiService';
+import { renderWithAi } from './services/openaiService';
 import { LoadingSpinner } from './components/LoadingSpinner';
-
-declare global {
-  interface AIStudio {
-    hasSelectedApiKey: () => Promise<boolean>;
-    openSelectKey: () => Promise<void>;
-  }
-
-  interface Window {
-    aistudio?: AIStudio;
-  }
-}
 
 const initialRenderOptions: Omit<RenderOptions, 'inputImage' | 'referenceImage'> = {
   materialReference: null,
@@ -148,13 +137,7 @@ const App: React.FC = () => {
   }, [isLoading]);
 
   const checkProKey = async () => {
-    if (renderOptions.modelQuality === 'Pro') {
-      const hasKey = await window.aistudio?.hasSelectedApiKey();
-      if (!hasKey) {
-        await window.aistudio?.openSelectKey();
-        return true;
-      }
-    }
+    // OpenAI doesn't require special key checking for Pro models
     return true;
   };
 
@@ -181,9 +164,8 @@ const App: React.FC = () => {
         setError('The model failed to return an image.');
       }
     } catch (err: any) {
-      if (err.message === 'PRO_KEY_ERROR') {
-        setError('The Pro model requires a valid paid API key. Please check your billing settings.');
-        await window.aistudio?.openSelectKey();
+      if (err.message === 'QUOTA_ERROR') {
+        setError('API quota exceeded. Please check your OpenAI billing settings.');
       } else if (err.message?.includes("503") || err.message?.includes("Deadline expired") || err.message?.includes("UNAVAILABLE")) {
         setError('The rendering engine is currently under heavy load. Please try again in a few moments, or switch to "Standard" quality for a faster response.');
       } else {
