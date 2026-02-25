@@ -5,7 +5,7 @@ const API_BASE_URL = process.env.NODE_ENV === 'production'
 export const generateImage = async (prompt: string, quality: 'standard' | 'hd' = 'standard', size: string = '1024x1024'): Promise<string> => {
   if (process.env.NODE_ENV === 'production') {
     // Direct Google AI call in production
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${process.env.GOOGLE_API_KEY}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${import.meta.env.VITE_GOOGLE_API_KEY}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
