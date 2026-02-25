@@ -10,7 +10,9 @@ export default defineConfig(({ mode }) => {
         host: '0.0.0.0',
       },
       plugins: [react()],
-      define: {},
+      define: {
+        'process.env.GOOGLE_API_KEY': JSON.stringify(process.env.GOOGLE_API_KEY || env.GOOGLE_API_KEY)
+      },
       resolve: {
         alias: {
           '@': path.resolve(__dirname, '.'),
