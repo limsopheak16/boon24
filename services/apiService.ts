@@ -1,4 +1,6 @@
-const API_BASE_URL = 'http://localhost:3001/api';
+const API_BASE_URL = process.env.NODE_ENV === 'production' 
+  ? '/api'  // Production: same domain
+  : 'http://localhost:3002/api';  // Development: local server
 
 export const generateImage = async (prompt: string, quality: 'standard' | 'hd' = 'standard', size: string = '1024x1024'): Promise<string> => {
   const response = await fetch(`${API_BASE_URL}/generate-image`, {

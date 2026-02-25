@@ -1,5 +1,5 @@
 import express from 'express';
-import { OpenAI } from 'openai';
+import { GoogleGenAI } from '@google/genai';
 import cors from 'cors';
 import path from 'path';
 import dotenv from 'dotenv';
@@ -8,7 +8,7 @@ import dotenv from 'dotenv';
 dotenv.config({ path: '.env.server' });
 
 const app = express();
-const port = 3001;
+const port = 3002;
 
 // Middleware
 app.use(cors());
@@ -21,40 +21,55 @@ if (process.env.NODE_ENV !== 'production') {
     res.json({ status: 'Backend server is running' });
   });
 } else {
-  // In production, serve the built React app
+  // In production, serve the built React app AND API
   app.use(express.static(path.join(process.cwd(), 'dist')));
   
-  // Serve the React app
+  // Serve the React app for all non-API routes
   app.get('*', (req, res) => {
+    if (req.path.startsWith('/api')) {
+      // Let API routes handle themselves
+      return;
+    }
     res.sendFile(path.join(process.cwd(), 'dist', 'index.html'));
   });
 }
 
-// Initialize OpenAI
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+// Initialize Google AI
+const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
 
 // Proxy endpoint for image generation
 app.post('/api/generate-image', async (req, res) => {
   try {
     const { prompt, quality = 'standard', size = '1024x1024' } = req.body;
     
-    const response = await openai.images.generate({
-      model: 'dall-e-3',
-      prompt: prompt,
-      n: 1,
-      size: size,
-      quality: quality,
-      style: 'natural'
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-image',
+      contents: { parts: [{ text: prompt }] },
+      config: {
+        imageConfig: {
+          aspectRatio: '1:1',
+          imageSize: '1024x1024'
+        }
+      }
     });
+
+    // Extract image from response
+    let imageUrl = null;
+    if (response.candidates && response.candidates[0]) {
+      for (const part of response.candidates[0].content.parts) {
+        if (part.inlineData) {
+          imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+          break;
+        }
+      }
+    }
 
     res.json({ 
       success: true, 
-      imageUrl: response.data[0].url 
+      imageUrl: imageUrl 
     });
   } catch (error) {
-    console.error('OpenAI API Error:', error);
+    console.error('Google AI API Error:', error);
     res.status(500).json({ 
       success: false, 
       error: error.message 
@@ -67,21 +82,37 @@ app.post('/api/edit-image', async (req, res) => {
   try {
     const { prompt, image, mask } = req.body;
     
-    const response = await openai.images.edit({
-      model: 'dall-e-2',
-      image: image,
-      mask: mask,
-      prompt: prompt,
-      n: 1,
-      size: '1024x1024'
+    // For now, use generation for editing as well
+    const enhancedPrompt = `ARCHITECTURAL EDITING: ${prompt}`;
+    
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-image',
+      contents: { parts: [{ text: enhancedPrompt }] },
+      config: {
+        imageConfig: {
+          aspectRatio: '1:1',
+          imageSize: '1024x1024'
+        }
+      }
     });
+
+    // Extract image from response
+    let imageUrl = null;
+    if (response.candidates && response.candidates[0]) {
+      for (const part of response.candidates[0].content.parts) {
+        if (part.inlineData) {
+          imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+          break;
+        }
+      }
+    }
 
     res.json({ 
       success: true, 
-      imageUrl: response.data[0].url 
+      imageUrl: imageUrl 
     });
   } catch (error) {
-    console.error('OpenAI API Error:', error);
+    console.error('Google AI API Error:', error);
     res.status(500).json({ 
       success: false, 
       error: error.message 
