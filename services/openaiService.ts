@@ -247,6 +247,12 @@ Output a ultra-photorealistic, high-fidelity 4K architectural visualization with
         ARCHITECTURAL ENHANCEMENT TASK:
         Base the design on the provided architectural input while applying these enhancements:
         
+        CRITICAL: Analyze the uploaded architectural image and recreate it with these specifications:
+        - PRESERVE the original building's form, structure, and architectural style
+        - MAINTAIN the same roof design, window placement, and facade layout
+        - ENHANCE with 4K photorealistic rendering quality
+        - APPLY the selected render style and lighting conditions
+        
         ${promptText}
         
         CRITICAL: Maintain the core architectural structure and proportions from the input while elevating the design quality to professional 4K architectural visualization standards.

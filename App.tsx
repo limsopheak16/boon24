@@ -6,7 +6,7 @@ import { EditPanel } from './components/EditPanel';
 import { MaterialPanel } from './components/MaterialPanel';
 import { Login } from './components/Login';
 import { RenderOptions, AppMode } from './types';
-import { renderWithAi } from './services/openaiService';
+import { renderWithAi } from './services/geminiService';
 import { LoadingSpinner } from './components/LoadingSpinner';
 
 const initialRenderOptions: Omit<RenderOptions, 'inputImage' | 'referenceImage'> = {
