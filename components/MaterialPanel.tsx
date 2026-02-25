@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ImageUploader } from './ImageUploader';
-import { editImageWithAi } from '../services/geminiService';
+import { editImageWithAi } from '../services/openaiService';
 import { LoadingSpinner } from './LoadingSpinner';
 import { MeasurementCanvas } from './MeasurementCanvas';
 import { ComparisonView } from './ComparisonView';
@@ -84,9 +84,8 @@ export const MaterialPanel: React.FC = () => {
                 setError('Failed to apply material. Engine timeout.');
             }
         } catch(err: any) {
-            if (err.message?.includes("Requested entity was not found") || err.message === 'PRO_KEY_ERROR') {
-                setError('Material Lab requires an active Pro key.');
-                await window.aistudio.openSelectKey();
+            if (err.message?.includes("insufficient_quota") || err.message === 'QUOTA_ERROR') {
+                setError('Material Lab requires an active OpenAI billing plan.');
             } else {
                 setError(err instanceof Error ? err.message : 'Transformation failure.');
             }

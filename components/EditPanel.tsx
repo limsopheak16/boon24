@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ImageUploader } from './ImageUploader';
-import { editImageWithAi } from '../services/geminiService';
+import { editImageWithAi } from '../services/openaiService';
 import { LoadingSpinner } from './LoadingSpinner';
 import { MeasurementCanvas } from './MeasurementCanvas';
 import { ComparisonView } from './ComparisonView';
@@ -97,9 +97,8 @@ export const EditPanel: React.FC = () => {
                 setError('Engine returned empty frame. Retry required.');
             }
         } catch(err: any) {
-            if (err.message?.includes("Requested entity was not found") || err.message === 'PRO_KEY_ERROR') {
-                setError('PRO Engine access denied. Billing verification needed.');
-                await window.aistudio.openSelectKey();
+            if (err.message?.includes("insufficient_quota") || err.message === 'QUOTA_ERROR') {
+                setError('PRO Engine access denied. Please check your OpenAI billing settings.');
             } else {
                 setError(err instanceof Error ? err.message : 'Autonomous synthesis failure.');
             }
