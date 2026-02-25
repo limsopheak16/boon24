@@ -1,12 +1,18 @@
 import { GoogleGenAI } from "@google/genai";
 import { RenderOptions, AspectRatio } from '../types';
 
+interface ViteEnv {
+  [key: string]: string | undefined;
+}
+
 const getEnvVar = (key: string): string | undefined => {
-  if (typeof window !== 'undefined' && window.process && window.process.env) {
-    return window.process.env[key];
+  // Try Vite env first (browser)
+  if ((import.meta as any).env[key]) {
+    return (import.meta as any).env[key];
   }
-  if (typeof globalThis !== 'undefined' && globalThis.process && globalThis.process.env) {
-    return globalThis.process.env[key];
+  // Fallback to process.env (server)
+  if (typeof process !== 'undefined' && process.env && process.env[key]) {
+    return process.env[key];
   }
   return undefined;
 };

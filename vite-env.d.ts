@@ -1,10 +1,11 @@
 /// <reference types="vite/client" />
+/// <reference types="vite/client" />
 /// <reference types="react" />
 
 interface ImportMetaEnv {
-  readonly VITE_GOOGLE_API_KEY: string
+  [key: string]: string | undefined;
 }
 
 interface ImportMeta {
-  readonly env: ImportMetaEnv
+  env: ImportMetaEnv;
 }
