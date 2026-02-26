@@ -92,7 +92,7 @@ const callWithRetry = async (fn: () => Promise<any>, maxRetries = 3, initialDela
 };
 
 export const renderWithAi = async (options: RenderOptions): Promise<{images: string[], urls?: any[]} | null> => {
-  const ai = new GoogleGenAI({ apiKey: getEnvVar('GOOGLE_API_KEY') });
+  const ai = new GoogleGenAI({ apiKey: getEnvVar('VITE_GOOGLE_API_KEY') });
   const { 
     inputImage, 
     referenceImage, 
@@ -238,6 +238,13 @@ DIRECTIVE: ${creativityLevel} - ${creativityInstructions[creativityLevel]}
 
 ${priorityModificationDirective}
 ${materialReferenceDirective}
+
+CRITICAL ARCHITECTURAL PRESERVATION INSTRUCTIONS:
+- MANDATORY: You MUST use the uploaded architectural image as your PRIMARY reference
+- FORBIDDEN: Do NOT generate a completely different building design
+- REQUIRED: Preserve the exact building structure, roof design, window placement, and facade layout
+- ENHANCE: Only improve lighting, materials, and rendering quality while maintaining the original design
+- ANALYZE: Study the uploaded image carefully and recreate it with professional 4K rendering quality
 
 ARCHITECTURAL INTENT:
 ${isTextToConcept ? '- Generate a GROUNDBREAKING architectural concept from scratch in 4K.' : '- Enhance the provided geometry with 4K clarity.'}
